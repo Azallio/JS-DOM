@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="./index.css" />
+		<title>Задача 6 - Форма заявки на пересдачу</title>
+	</head>
+	<body>
+		<div class="container">
+			<h1>Задача 6: Форма заявки на пересдачу</h1>
+			<p class="description">
+				Заполните форму для подачи заявки на пересдачу экзамена
+			</p>
+
+			<div id="formMessage"></div>
+
+			<div class="form-container">
+				<div class="form-section">
+					<form id="retakeForm">
+						<div class="form-group">
+							<label>ФИО студента <span>*</span></label>
+							<input
+								type="text"
+								id="studentName"
+								placeholder="Иванов Иван Иванович"
+							/>
+							<span class="error-message" id="nameError"></span>
+						</div>
+
+						<div class="form-group">
+							<label>Номер студенческого билета <span>*</span></label>
+							<input type="text" id="studentId" placeholder="123456" />
+							<span class="error-message" id="idError"></span>
+						</div>
+
+						<div class="form-group">
+							<label>Группа <span>*</span></label>
+							<input type="text" id="studentGroup" placeholder="ИТ-21" />
+							<span class="error-message" id="groupError"></span>
+						</div>
+
+						<div class="form-group">
+							<label>Предмет пересдачи <span>*</span></label>
+							<input
+								type="text"
+								id="subject"
+								placeholder="Математический анализ"
+							/>
+							<span class="error-message" id="subjectError"></span>
+						</div>
+
+						<div class="form-group">
+							<label>Преподаватель <span>*</span></label>
+							<input type="text" id="teacher" placeholder="Петров П.П." />
+							<span class="error-message" id="teacherError"></span>
+						</div>
+
+						<div class="form-group">
+							<label>Желаемая дата пересдачи <span>*</span></label>
+							<input type="date" id="retakeDate" />
+							<span class="error-message" id="dateError"></span>
+						</div>
+
+						<div class="form-group">
+							<label>Причина пересдачи <span>*</span></label>
+							<select id="reason">
+								<option value="">Выберите причину</option>
+								<option value="illness">Болезнь</option>
+								<option value="family">Семейные обстоятельства</option>
+								<option value="work">Работа</option>
+								<option value="other">Другое</option>
+							</select>
+							<span class="error-message" id="reasonError"></span>
+						</div>
+
+						<button type="submit" class="btn">Подать заявку</button>
+					</form>
+				</div>
+
+				<div class="preview-card">
+					<div class="preview-title">📋 Предпросмотр заявки</div>
+					<div id="formPreview">
+						<div class="preview-item">
+							<span class="preview-label">ФИО:</span>
+							<span class="preview-value" id="previewName">-</span>
+						</div>
+						<div class="preview-item">
+							<span class="preview-label">№ билета:</span>
+							<span class="preview-value" id="previewId">-</span>
+						</div>
+						<div class="preview-item">
+							<span class="preview-label">Группа:</span>
+							<span class="preview-value" id="previewGroup">-</span>
+						</div>
+						<div class="preview-item">
+							<span class="preview-label">Предмет:</span>
+							<span class="preview-value" id="previewSubject">-</span>
+						</div>
+						<div class="preview-item">
+							<span class="preview-label">Преподаватель:</span>
+							<span class="preview-value" id="previewTeacher">-</span>
+						</div>
+						<div class="preview-item">
+							<span class="preview-label">Дата:</span>
+							<span class="preview-value" id="previewDate">-</span>
+						</div>
+						<div class="preview-item">
+							<span class="preview-label">Причина:</span>
+							<span class="preview-value" id="previewReason">-</span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="table-section">
+				<h2>Поданные заявки</h2>
+				<table class="applications-table">
+					<thead>
+						<tr>
+							<th>ФИО</th>
+							<th>№ Билета</th>
+							<th>Группа</th>
+							<th>Предмет</th>
+							<th>Преподаватель</th>
+							<th>Дата</th>
+							<th>Причина</th>
+						</tr>
+					</thead>
+					<tbody id="applicationsBody">
+						<tr>
+							<td colspan="7" class="empty-state">Нет поданных заявок</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<script src="./index.js"></script>
+	</body>
+</html>

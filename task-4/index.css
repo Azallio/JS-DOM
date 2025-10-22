@@ -1,0 +1,139 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	min-height: 100vh;
+	padding: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.container {
+	background: white;
+	border-radius: 15px;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+	padding: 40px;
+	max-width: 700px;
+	width: 100%;
+}
+
+h1 {
+	color: #333;
+	margin-bottom: 10px;
+	font-size: 28px;
+	text-align: center;
+}
+
+.description {
+	text-align: center;
+	color: #666;
+	margin-bottom: 30px;
+	font-size: 14px;
+}
+
+.menu-list {
+	list-style: none;
+}
+
+.menu-item {
+	border-bottom: 1px solid #e9ecef;
+}
+
+.menu-item:last-child {
+	border-bottom: none;
+}
+
+.menu-header {
+	padding: 18px 20px;
+	cursor: pointer;
+	background: #f8f9fa;
+	transition: all 0.3s;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-weight: 600;
+	user-select: none;
+}
+
+.menu-header:hover {
+	background: #e9ecef;
+}
+
+.menu-header.active {
+	background: #667eea;
+	color: white;
+}
+
+.menu-title {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.menu-arrow {
+	transition: transform 0.3s;
+	font-size: 14px;
+}
+
+.menu-arrow.open {
+	transform: rotate(90deg);
+}
+
+.submenu {
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.4s ease;
+	background: white;
+}
+
+.submenu.open {
+	max-height: 2000px;
+}
+
+.submenu .menu-header {
+	padding-left: 40px;
+	background: white;
+	font-weight: 500;
+}
+
+.submenu .menu-header:hover {
+	background: #f8f9fa;
+}
+
+.submenu .submenu .menu-header {
+	padding-left: 60px;
+	font-weight: 400;
+}
+
+.student-details {
+	padding: 15px 80px;
+	background: #e7f3ff;
+	font-size: 14px;
+	color: #333;
+	border-left: 4px solid #667eea;
+	margin: 5px 0;
+	line-height: 1.6;
+}
+
+.student-details strong {
+	color: #667eea;
+}
+
+.level-icon {
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+	background: #667eea;
+	color: white;
+	border-radius: 50%;
+	text-align: center;
+	line-height: 24px;
+	font-size: 12px;
+	font-weight: bold;
+}
