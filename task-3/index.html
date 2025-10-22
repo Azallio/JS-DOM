@@ -13,21 +13,9 @@
 				Управление студентами с академическими задолженностями
 			</p>
 			<div class="filters">
-				<button class="filter-btn active" onclick="filterStudents('all')">
-					Все
-				</button>
-				<button class="filter-btn" onclick="filterStudents('high')">
-					Высокий приоритет
-				</button>
-				<button class="filter-btn" onclick="filterStudents('medium')">
-					Средний приоритет
-				</button>
-				<button class="filter-btn" onclick="filterStudents('low')">
-					Низкий приоритет
-				</button>
-				<button class="filter-btn" onclick="filterStudents('pending')">
-					Ожидают
-				</button>
+				<button class="filter-btn active" data-filter="all">Все</button>
+				<button class="filter-btn" data-filter="high">Высокий</button>
+				<button class="filter-btn" data-filter="pending">Ожидает</button>
 			</div>
 
 			<div id="studentsGrid" class="students-grid"></div>

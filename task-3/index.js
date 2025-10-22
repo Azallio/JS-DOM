@@ -13,8 +13,8 @@ const studentsData = [
 		photo: "https://example.com/photo2.jpg",
 		group: "ИТ-22",
 		debtSubject: "Программирование",
-		priority: "medium",
-		status: "in_progress",
+		priority: "high",
+		status: "pending",
 		id: 2,
 	},
 	{
@@ -31,7 +31,7 @@ const studentsData = [
 		photo: "https://example.com/photo4.jpg",
 		group: "ИТ-21",
 		debtSubject: "Веб-технологии",
-		priority: "high",
+		priority: "low",
 		status: "pending",
 		id: 4,
 	},
@@ -40,115 +40,179 @@ const studentsData = [
 		photo: "https://example.com/photo5.jpg",
 		group: "ИТ-24",
 		debtSubject: "Физика",
-		priority: "medium",
+		priority: "high",
 		status: "pending",
 		id: 5,
 	},
 ];
 
+// Константы для текстов
+const PRIORITY_TEXT = {
+	high: "Высокий",
+	low: "Низкий",
+};
+
+const STATUS_TEXT = {
+	pending: "Ожидает",
+	in_progress: "В процессе",
+	completed: "Завершено",
+};
+
+const PRIORITY_FILTERS = ["high", "medium", "low"];
+
 let currentFilter = "all";
+
+// Получение инициалов из имени
+function getInitials(name) {
+	return name
+		.split(" ")
+		.map(n => n[0])
+		.join("");
+}
+
+// Фильтрация студентов
+function getFilteredStudents(filter) {
+	if (filter === "all") return studentsData;
+
+	if (PRIORITY_FILTERS.includes(filter)) {
+		return studentsData.filter(s => s.priority === filter);
+	}
+
+	return studentsData.filter(s => s.status === filter);
+}
+
+// Создание HTML карточки студента
+function createStudentCard(student) {
+	const card = document.createElement("div");
+	card.className = `student-card priority-${student.priority}`;
+	card.dataset.studentId = student.id;
+
+	const isCompleted = student.status === "completed";
+	const buttonText = isCompleted ? "✓ Обработан" : "Отметить как обработанный";
+
+	card.innerHTML = `
+		<div class="student-photo">
+			${getInitials(student.name)}
+			<div class="priority-badge">${PRIORITY_TEXT[student.priority]}</div>
+		</div>
+		<div class="student-info">
+			<div class="student-name">${student.name}</div>
+			<div class="student-detail">
+				<span class="detail-label">Группа:</span>
+				<span>${student.group}</span>
+			</div>
+			<div class="student-detail">
+				<span class="detail-label">Предмет:</span>
+				<span>${student.debtSubject}</span>
+			</div>
+			<span class="status-badge status-${student.status}">
+				${STATUS_TEXT[student.status]}
+			</span>
+			<button class="process-btn" data-action="mark-processed" ${
+				isCompleted ? "disabled" : ""
+			}>
+				${buttonText}
+			</button>
+		</div>
+	`;
+
+	return card;
+}
 
 // Отображение студентов
 function renderStudents() {
 	const grid = document.getElementById("studentsGrid");
-	grid.innerHTML = "";
-
-	// Фильтрация студентов
-	let filteredStudents = studentsData;
-	if (currentFilter !== "all") {
-		if (["high", "medium", "low"].includes(currentFilter)) {
-			filteredStudents = studentsData.filter(s => s.priority === currentFilter);
-		} else if (currentFilter === "pending") {
-			filteredStudents = studentsData.filter(s => s.status === "pending");
-		}
+	if (!grid) {
+		console.error("Элемент studentsGrid не найден");
+		return;
 	}
 
-	// Создание карточек
+	grid.innerHTML = "";
+
+	const filteredStudents = getFilteredStudents(currentFilter);
+
+	if (filteredStudents.length === 0) {
+		grid.innerHTML = '<p class="no-results">Студенты не найдены</p>';
+		return;
+	}
+
+	const fragment = document.createDocumentFragment();
 	filteredStudents.forEach(student => {
-		const card = document.createElement("div");
-		card.className = `student-card priority-${student.priority}`;
-
-		// Получаем инициалы
-		const initials = student.name
-			.split(" ")
-			.map(n => n[0])
-			.join("");
-
-		// Текст приоритета
-		const priorityText = {
-			high: "Высокий",
-			medium: "Средний",
-			low: "Низкий",
-		};
-
-		// Текст статуса
-		const statusText = {
-			pending: "Ожидает",
-			in_progress: "В процессе",
-			completed: "Завершено",
-		};
-
-		card.innerHTML = `
-                    <div class="student-photo">
-                        ${initials}
-                        <div class="priority-badge">${
-													priorityText[student.priority]
-												}</div>
-                    </div>
-                    <div class="student-info">
-                        <div class="student-name">${student.name}</div>
-                        <div class="student-detail">
-                            <span class="detail-label">Группа:</span>
-                            <span>${student.group}</span>
-                        </div>
-                        <div class="student-detail">
-                            <span class="detail-label">Предмет:</span>
-                            <span>${student.debtSubject}</span>
-                        </div>
-                        <span class="status-badge status-${student.status}">
-                            ${statusText[student.status]}
-                        </span>
-                        <button class="process-btn" onclick="markAsProcessed(${
-													student.id
-												})" 
-                                ${
-																	student.status === "completed"
-																		? "disabled"
-																		: ""
-																}>
-                            ${
-															student.status === "completed"
-																? "✓ Обработан"
-																: "Отметить как обработанный"
-														}
-                        </button>
-                    </div>
-                `;
-
-		grid.appendChild(card);
+		fragment.appendChild(createStudentCard(student));
 	});
+
+	grid.appendChild(fragment);
 }
 
 // Отметить студента как обработанного
 function markAsProcessed(id) {
 	const student = studentsData.find(s => s.id === id);
-	if (student && student.status !== "completed") {
+	if (!student) {
+		console.error(`Студент с id ${id} не найден`);
+		return;
+	}
+
+	if (student.status !== "completed") {
 		student.status = "completed";
 		renderStudents();
 	}
 }
 
 // Фильтрация студентов
-function filterStudents(filter) {
+function filterStudents(filter, buttonElement) {
 	currentFilter = filter;
 
 	// Обновление активной кнопки
-	const buttons = document.querySelectorAll(".filter-btn");
-	buttons.forEach(btn => btn.classList.remove("active"));
-	event.target.classList.add("active");
+	document.querySelectorAll(".filter-btn").forEach(btn => {
+		btn.classList.remove("active");
+	});
+
+	if (buttonElement) {
+		buttonElement.classList.add("active");
+	}
 
 	renderStudents();
 }
 
+// Обработчик событий делегирования
+function handleGridClick(e) {
+	const button = e.target.closest('[data-action="mark-processed"]');
+	if (!button || button.disabled) return;
+
+	const card = button.closest("[data-student-id]");
+	if (card) {
+		const studentId = parseInt(card.dataset.studentId);
+		markAsProcessed(studentId);
+	}
+}
+
+function handleFilterClick(e) {
+	const button = e.target.closest(".filter-btn");
+	if (!button) return;
+
+	const filter = button.dataset.filter || "all";
+	filterStudents(filter, button);
+}
+
+// Инициализация
+function init() {
+	renderStudents();
+
+	// Добавление обработчиков событий через делегирование
+	const grid = document.getElementById("studentsGrid");
+	if (grid) {
+		grid.addEventListener("click", handleGridClick);
+	}
+
+	const filterContainer = document.querySelector(".filters");
+	if (filterContainer) {
+		filterContainer.addEventListener("click", handleFilterClick);
+	}
+}
+
 // Инициализация при загрузке
-window.addEventListener("DOMContentLoaded", renderStudents);
+if (document.readyState === "loading") {
+	document.addEventListener("DOMContentLoaded", init);
+} else {
+	init();
+}
