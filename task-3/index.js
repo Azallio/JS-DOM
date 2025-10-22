@@ -144,6 +144,18 @@ function renderStudents() {
 	grid.appendChild(fragment);
 }
 
+// Обработчик событий делегирования
+function handleGridClick(e) {
+	const button = e.target.closest('[data-action="mark-processed"]');
+	if (!button || button.disabled) return;
+
+	const card = button.closest("[data-student-id]");
+	if (card) {
+		const studentId = parseInt(card.dataset.studentId);
+		markAsProcessed(studentId);
+	}
+}
+
 // Отметить студента как обработанного
 function markAsProcessed(id) {
 	const student = studentsData.find(s => s.id === id);
@@ -162,28 +174,11 @@ function markAsProcessed(id) {
 function filterStudents(filter, buttonElement) {
 	currentFilter = filter;
 
-	// Обновление активной кнопки
-	document.querySelectorAll(".filter-btn").forEach(btn => {
-		btn.classList.remove("active");
-	});
-
 	if (buttonElement) {
 		buttonElement.classList.add("active");
 	}
 
 	renderStudents();
-}
-
-// Обработчик событий делегирования
-function handleGridClick(e) {
-	const button = e.target.closest('[data-action="mark-processed"]');
-	if (!button || button.disabled) return;
-
-	const card = button.closest("[data-student-id]");
-	if (card) {
-		const studentId = parseInt(card.dataset.studentId);
-		markAsProcessed(studentId);
-	}
 }
 
 function handleFilterClick(e) {
@@ -210,9 +205,4 @@ function init() {
 	}
 }
 
-// Инициализация при загрузке
-if (document.readyState === "loading") {
-	document.addEventListener("DOMContentLoaded", init);
-} else {
-	init();
-}
+window.addEventListener("DOMContentLoaded", init);
