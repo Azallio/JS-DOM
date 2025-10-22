@@ -1,264 +1,115 @@
-// Массив для хранения заявок
 const applications = [];
-
-// Словарь для отображения причин
-const reasonTexts = {
+const REASON_TEXTS = {
 	illness: "Болезнь",
-	family: "Семейные обстоятельства",
+	family: "Семья",
 	work: "Работа",
 	other: "Другое",
 };
 
-// Инициализация формы
-function initForm() {
-	const form = document.getElementById("retakeForm");
+const DOM = {
+	form: document.getElementById("retakeForm"),
+	applicationsBody: document.getElementById("applicationsBody"),
+	formMessage: document.getElementById("formMessage"),
+	preview: {
+		name: document.getElementById("previewName"),
+		id: document.getElementById("previewId"),
+		group: document.getElementById("previewGroup"),
+		subject: document.getElementById("previewSubject"),
+		teacher: document.getElementById("previewTeacher"),
+		date: document.getElementById("previewDate"),
+		reason: document.getElementById("previewReason"),
+	},
+};
 
-	// Добавляем слушатели для обновления предпросмотра
-	const inputs = [
-		"studentName",
-		"studentId",
-		"studentGroup",
-		"subject",
-		"teacher",
-		"retakeDate",
-		"reason",
-	];
-
-	inputs.forEach(inputId => {
-		const input = document.getElementById(inputId);
-		input.addEventListener("input", updatePreview);
-		input.addEventListener("change", updatePreview);
-	});
-
-	// Обработчик отправки формы
-	form.addEventListener("submit", handleFormSubmit);
+function getFormData() {
+	const f = DOM.form;
+	return {
+		studentName: f.studentName.value.trim(),
+		studentId: f.studentId.value.trim(),
+		studentGroup: f.studentGroup.value.trim(),
+		subject: f.subject.value.trim(),
+		teacher: f.teacher.value.trim(),
+		retakeDate: f.retakeDate.value,
+		reason: f.reason.value,
+	};
 }
 
-// Обновление предпросмотра
+function formatDate(d) {
+	if (!d) return "-";
+	return new Date(d).toLocaleDateString("ru-RU");
+}
+
 function updatePreview() {
-	const studentName = document.getElementById("studentName").value;
-	const studentId = document.getElementById("studentId").value;
-	const studentGroup = document.getElementById("studentGroup").value;
-	const subject = document.getElementById("subject").value;
-	const teacher = document.getElementById("teacher").value;
-	const retakeDate = document.getElementById("retakeDate").value;
-	const reason = document.getElementById("reason").value;
-
-	document.getElementById("previewName").textContent = studentName || "-";
-	document.getElementById("previewId").textContent = studentId || "-";
-	document.getElementById("previewGroup").textContent = studentGroup || "-";
-	document.getElementById("previewSubject").textContent = subject || "-";
-	document.getElementById("previewTeacher").textContent = teacher || "-";
-	document.getElementById("previewDate").textContent = retakeDate
-		? formatDate(retakeDate)
-		: "-";
-	document.getElementById("previewReason").textContent = reason
-		? reasonTexts[reason]
-		: "-";
+	const d = getFormData();
+	DOM.preview.name.textContent = d.studentName || "-";
+	DOM.preview.id.textContent = d.studentId || "-";
+	DOM.preview.group.textContent = d.studentGroup || "-";
+	DOM.preview.subject.textContent = d.subject || "-";
+	DOM.preview.teacher.textContent = d.teacher || "-";
+	DOM.preview.date.textContent = formatDate(d.retakeDate);
+	DOM.preview.reason.textContent = d.reason ? REASON_TEXTS[d.reason] : "-";
 }
 
-// Форматирование даты
-function formatDate(dateString) {
-	const date = new Date(dateString);
-	const day = String(date.getDate()).padStart(2, "0");
-	const month = String(date.getMonth() + 1).padStart(2, "0");
-	const year = date.getFullYear();
-	return `${day}.${month}.${year}`;
+function showMessage(type, text) {
+	DOM.formMessage.innerHTML = `<div class="alert alert-${type}">${text}</div>`;
+	setTimeout(() => (DOM.formMessage.innerHTML = ""), 5000);
 }
 
-// Валидация формы
-function validateForm() {
-	let isValid = true;
-
-	const fields = [
-		{
-			id: "studentName",
-			error: "nameError",
-			message: "Введите ФИО студента",
-			pattern: /^[А-Яа-яЁё\s-]+$/,
-			patternMessage: "ФИО должно содержать только русские буквы",
-		},
-		{
-			id: "studentId",
-			error: "idError",
-			message: "Введите номер студенческого билета",
-			pattern: /^\d{4,8}$/,
-			patternMessage: "Номер должен содержать от 4 до 8 цифр",
-		},
-		{
-			id: "studentGroup",
-			error: "groupError",
-			message: "Введите группу",
-			pattern: /^[А-Яа-я]{2,4}-\d{2}$/,
-			patternMessage: "Формат группы: ИТ-21",
-		},
-		{
-			id: "subject",
-			error: "subjectError",
-			message: "Введите предмет пересдачи",
-		},
-		{
-			id: "teacher",
-			error: "teacherError",
-			message: "Введите ФИО преподавателя",
-		},
-		{
-			id: "retakeDate",
-			error: "dateError",
-			message: "Выберите дату пересдачи",
-		},
-		{
-			id: "reason",
-			error: "reasonError",
-			message: "Выберите причину пересдачи",
-		},
-	];
-
-	// Очищаем предыдущие ошибки
-	fields.forEach(field => {
-		const input = document.getElementById(field.id);
-		const errorDiv = document.getElementById(field.error);
-		input.classList.remove("error");
-		errorDiv.textContent = "";
-	});
-
-	// Проверяем каждое поле
-	fields.forEach(field => {
-		const input = document.getElementById(field.id);
-		const errorDiv = document.getElementById(field.error);
-		const value = input.value.trim();
-
-		if (!value) {
-			input.classList.add("error");
-			errorDiv.textContent = field.message;
-			isValid = false;
-		} else if (field.pattern && !field.pattern.test(value)) {
-			input.classList.add("error");
-			errorDiv.textContent = field.patternMessage;
-			isValid = false;
-		}
-	});
-
-	// Проверка на будущую дату
-	const retakeDateInput = document.getElementById("retakeDate");
-	const retakeDate = new Date(retakeDateInput.value);
-	const today = new Date();
-	today.setHours(0, 0, 0, 0);
-
-	if (retakeDate < today) {
-		retakeDateInput.classList.add("error");
-		document.getElementById("dateError").textContent =
-			"Дата должна быть в будущем";
-		isValid = false;
-	}
-
-	// Проверка на уникальность заявки
-	if (isValid) {
-		const studentName = document.getElementById("studentName").value.trim();
-		const subject = document.getElementById("subject").value.trim();
-
-		const duplicate = applications.find(
-			app =>
-				app.studentName.toLowerCase() === studentName.toLowerCase() &&
-				app.subject.toLowerCase() === subject.toLowerCase()
-		);
-
-		if (duplicate) {
-			showMessage(
-				"error",
-				"Заявка от этого студента на данный предмет уже существует!"
-			);
-			isValid = false;
-		}
-	}
-
-	return isValid;
+function addApplicationToTable(app) {
+	const row = document.createElement("tr");
+	row.innerHTML = `
+		<td>${app.studentName}</td>
+		<td>${app.studentId}</td>
+		<td>${app.studentGroup}</td>
+		<td>${app.subject}</td>
+		<td>${app.teacher}</td>
+		<td>${formatDate(app.retakeDate)}</td>
+		<td>${REASON_TEXTS[app.reason] || "-"}</td>
+	`;
+	DOM.applicationsBody.appendChild(row);
 }
 
-// Обработка отправки формы
 function handleFormSubmit(e) {
 	e.preventDefault();
+	const d = getFormData();
 
-	if (!validateForm()) {
+	// простая проверка обязательных полей
+	if (
+		!d.studentName ||
+		!d.studentId ||
+		!d.studentGroup ||
+		!d.subject ||
+		!d.teacher ||
+		!d.retakeDate ||
+		!d.reason
+	) {
+		showMessage("error", "Заполните все поля!");
 		return;
 	}
 
-	// Создаем объект заявки
-	const application = {
-		studentName: document.getElementById("studentName").value.trim(),
-		studentId: document.getElementById("studentId").value.trim(),
-		studentGroup: document.getElementById("studentGroup").value.trim(),
-		subject: document.getElementById("subject").value.trim(),
-		teacher: document.getElementById("teacher").value.trim(),
-		retakeDate: document.getElementById("retakeDate").value,
-		reason: document.getElementById("reason").value,
-	};
-
-	// Добавляем в массив
-	applications.push(application);
-
-	// Добавляем в таблицу
-	addApplicationToTable(application);
-
-	// Показываем сообщение об успехе
-	showMessage("success", "Заявка успешно подана!");
-
-	// Очищаем форму
-	document.getElementById("retakeForm").reset();
-
-	// Очищаем предпросмотр
-	updatePreview();
-
-	// Убираем ошибки
-	document
-		.querySelectorAll(".error")
-		.forEach(el => el.classList.remove("error"));
-	document
-		.querySelectorAll(".error-message")
-		.forEach(el => (el.textContent = ""));
-}
-
-// Добавление заявки в таблицу
-function addApplicationToTable(app) {
-	const tbody = document.getElementById("applicationsBody");
-
-	// Удаляем пустое состояние если есть
-	if (tbody.querySelector(".empty-state")) {
-		tbody.innerHTML = "";
+	// проверка дубликатов
+	if (
+		applications.some(
+			a =>
+				a.studentName.toLowerCase() === d.studentName.toLowerCase() &&
+				a.subject.toLowerCase() === d.subject.toLowerCase()
+		)
+	) {
+		showMessage("error", "Заявка уже существует!");
+		return;
 	}
 
-	const tr = document.createElement("tr");
-	tr.style.animation = "slideDown 0.3s";
-
-	const reasonClass = `reason-${app.reason}`;
-
-	tr.innerHTML = `
-                <td>${app.studentName}</td>
-                <td>${app.studentId}</td>
-                <td>${app.studentGroup}</td>
-                <td>${app.subject}</td>
-                <td>${app.teacher}</td>
-                <td>${formatDate(app.retakeDate)}</td>
-                <td><span class="reason-badge ${reasonClass}">${
-		reasonTexts[app.reason]
-	}</span></td>
-            `;
-
-	tbody.appendChild(tr);
+	applications.push(d);
+	addApplicationToTable(d);
+	showMessage("success", "Заявка подана!");
+	DOM.form.reset();
+	updatePreview();
 }
 
-// Показ сообщения
-function showMessage(type, text) {
-	const messageDiv = document.getElementById("formMessage");
-	messageDiv.innerHTML = `<div class="alert alert-${type}">${text}</div>`;
-
-	// Прокрутка к сообщению
-	messageDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
-
-	// Автоматическое скрытие через 5 секунд
-	setTimeout(() => {
-		messageDiv.innerHTML = "";
-	}, 5000);
+if (DOM.form) {
+	DOM.form.addEventListener("submit", handleFormSubmit);
+	DOM.form.addEventListener("input", updatePreview);
+	DOM.form.addEventListener("change", updatePreview);
+	updatePreview();
 }
-
-window.addEventListener("DOMContentLoaded", initForm);
+в
