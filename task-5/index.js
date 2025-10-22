@@ -46,54 +46,30 @@ function initSlider() {
 	function handleMove(clientX) {
 		const rect = track.getBoundingClientRect();
 		const x = clientX - rect.left;
-		console.log("user ", x);
 		const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
 		const value = Math.round((percentage / 100) * 9) + 1;
-		// console.log("width", rect.width);
-		// console.log("percentage", percentage);
-		// console.log("value", value);
+		console.log("user ", x);
+		console.log("width", rect.width);
+		console.log("percentage", percentage);
+		console.log("value", value);
 		updateSlider(value);
 	}
 
-	// События мыши для бегунка
 	thumb.addEventListener("mousedown", function (e) {
 		isDragging = true;
 		e.preventDefault();
 	});
-
-	// Глобальные события для перетаскивания
 	document.addEventListener("mousemove", function (e) {
 		if (isDragging) {
 			handleMove(e.clientX);
 		}
 	});
-
 	document.addEventListener("mouseup", function () {
 		isDragging = false;
 	});
-
-	// Клик по треку
 	track.addEventListener("click", function (e) {
 		handleMove(e.clientX);
 	});
-
-	document.addEventListener("touchmove", function (e) {
-		if (isDragging && e.touches.length > 0) {
-			handleMove(e.touches[0].clientX);
-		}
-	});
-
-	document.addEventListener("touchend", function () {
-		isDragging = false;
-	});
-
-	track.addEventListener("touchstart", function (e) {
-		if (e.touches.length > 0) {
-			handleMove(e.touches[0].clientX);
-		}
-	});
-
-	// Инициализация начального значения
 	updateSlider(1);
 }
 

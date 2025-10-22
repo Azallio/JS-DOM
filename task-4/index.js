@@ -1,5 +1,5 @@
 // Данные меню с расписанием пересдач
-	const menuData = {
+const menuData = {
 	"Факультет информационных технологий": {
 		"ИТ-21": {
 			"Иванов Алексей": "Математический анализ - 15.11.2025, 10:00, ауд. 301",
@@ -24,7 +24,7 @@
 	"Факультет экономики и управления": {
 		"ЭУ-31": {
 			"Морозов Андрей": "Экономическая теория - 27.11.2025, 12:00, ауд. 115",
-			"Новикова Дарья": "Статистика - 28.11.2025, 14:00, ауд. 220",
+			"Новикова Дарья": "Статистика - 28.11.2025, 14:00, ауд. 220"
 		},
 	},
 };
@@ -34,19 +34,14 @@ function createMenu() {
 	const menuContainer = document.getElementById("facultyMenu");
 	menuContainer.innerHTML = "";
 
-	Object.keys(menuData).forEach((faculty, index) => {
-		const facultyItem = createMenuItem(
-			faculty,
-			menuData[faculty],
-			1,
-			index + 1
-		);
+	Object.keys(menuData).forEach(faculty => {
+		const facultyItem = createMenuItem(faculty, menuData[faculty], 1);
 		menuContainer.appendChild(facultyItem);
 	});
 }
 
 // Создание элемента меню
-function createMenuItem(title, children, level, index) {
+function createMenuItem(title, children, level) {
 	const li = document.createElement("li");
 	li.className = "menu-item";
 
@@ -77,8 +72,8 @@ function createMenuItem(title, children, level, index) {
 		const submenu = document.createElement("ul");
 		submenu.className = "submenu menu-list";
 
-		Object.keys(children).forEach((key, idx) => {
-			const childItem = createMenuItem(key, children[key], level + 1, idx + 1);
+		Object.keys(children).forEach(key => {
+			const childItem = createMenuItem(key, children[key], level + 1);
 			submenu.appendChild(childItem);
 		});
 
